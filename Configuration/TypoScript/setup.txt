@@ -1,0 +1,13 @@
+plugin.tx_koningmailchimpsignup {
+    view {
+        templateRootPaths {
+            10 = EXT:koning_mailchimp_signup/Resources/Private/Templates
+        }
+        partialRootPaths {
+            10 = EXT:koning_mailchimp_signup/Resources/Private/Partials
+        }
+        layoutRootPaths {
+            10 = EXT:koning_mailchimp_signup/Resources/Private/Layouts
+        }
+    }
+}

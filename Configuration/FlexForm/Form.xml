@@ -1,0 +1,27 @@
+<T3DataStructure>
+    <meta>
+        <langDisable>1</langDisable>
+    </meta>
+    <ROOT>
+        <type>array</type>
+        <el>
+            <settings.data.list>
+                <TCEforms>
+                    <label>LLL:EXT:koning_mailchimp_signup/Resources/Private/Language/locallang_be.xlf:configuration.form.list</label>
+                    <config>
+                        <type>select</type>
+                        <foreign_table>tx_koningmailchimpsignup_domain_model_subscriberlist</foreign_table>
+                        <maxitems>1</maxitems>
+                        <eval>required</eval>
+                        <items>
+                            <numIndex index="1">
+                                <numIndex index="0">LLL:EXT:koning_mailchimp_signup/Resources/Private/Language/locallang_be.xlf:configuration.form.list.select</numIndex>
+                                <numIndex index="1"></numIndex>
+                            </numIndex>
+                        </items>
+                    </config>
+                </TCEforms>
+            </settings.data.list>
+        </el>
+    </ROOT>
+</T3DataStructure>

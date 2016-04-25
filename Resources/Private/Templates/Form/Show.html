@@ -1,0 +1,19 @@
+<f:layout name="Default" />
+
+<f:section name="Content">
+    <f:form.validationResults>
+        <f:if condition="{validationResults.flattenedErrors}">
+            <f:for each="{validationResults.flattenedErrors}" as="errors" key="propertyPath">
+                <f:for each="{errors}" as="error">
+                    <f:translate id="form.show.error.{propertyPath}.{error.code}" />
+                </f:for>
+            </f:for>
+        </f:if>
+    </f:form.validationResults>
+    <f:form action="create">
+        <h2><f:translate key="form.show.header" /></h2>
+        <p><f:translate key="form.show.text" /></p>
+        <f:form.textfield name="email" />
+        <f:form.submit value="{f:translate(key: 'form.show.submit')}" />
+    </f:form>
+</f:section>
