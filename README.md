@@ -11,7 +11,7 @@ This extension allows website visitors to sign up for a MailChimp list. It featu
 # Setup
 
 - Install the extension
-- Install `drewm/mailchimp-api`` using composer (``composer require drewm/mailchimp-api``) or include it manually
+- Install ``drewm/mailchimp-api`` using composer (``composer require drewm/mailchimp-api``) or include it manually
 - Configure the extension in the Extension Manager
 - Configure Scheduler tasks
 
