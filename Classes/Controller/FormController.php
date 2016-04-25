@@ -33,7 +33,7 @@ class FormController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
     public function showAction()
     {
         if (!class_exists('\DrewM\MailChimp\MailChimp')) {
-            throw new \Exception('MailChimp API wrapper not found. Run composer require drewm/mailchimp-api to install it and make sure vendor/autoload.php is included.');
+            throw new \Exception('MailChimp API wrapper not found. Run composer require drewm/mailchimp-api to install it.');
         }
 
         if (!ConfigurationUtility::isValid()) {
