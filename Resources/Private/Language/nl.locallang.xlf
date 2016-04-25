@@ -16,10 +16,10 @@
                 <target>Je bent al ingeschreven voor deze nieuwsbrief</target>
             </trans-unit>
             <trans-unit id="form.show.error.email.1221560718">
-                <target>Vul alsjeblieft je e-mailadres in</target>
+                <target>Verplicht veld</target>
             </trans-unit>
             <trans-unit id="form.show.error.email.1221559976">
-                <target>Vul alsjeblieft een geldig e-mailadres in</target>
+                <target>Ongeldig e-mailadres</target>
             </trans-unit>
             <trans-unit id="form.show.error.email.1461581360">
                 <target>De inschrijvingslijst kon niet gevonden worden, neem contact met ons op</target>

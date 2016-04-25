@@ -41,20 +41,40 @@ All data (lists and subscribers) is saved on the rootpage (page=0). Subscribers 
 
 You can override the template by using standard TypoScript:
 
-    plugin.tx_koningmailchimp_signup {
+    plugin.tx_koningmailchimpsignup_form {
         view {
             templateRootPaths {
-                5 = EXT:your_extension/Resources/Private/Templates
                 10 = EXT:tx_koningmailchimp_signup/Resources/Private/Templates
+                15 = EXT:your_extension/Resources/Private/Templates
             }
             partialRootPaths {
-                5 = EXT:your_extension/Resources/Private/Partials
                 10 = EXT:tx_koningmailchimp_signup/Resources/Private/Partials
+                15 = EXT:your_extension/Resources/Private/Partials
             }
             layoutRootPaths {
-                5 = EXT:your_extension/Resources/Private/Layouts
                 10 = EXT:tx_koningmailchimp_signup/Resources/Private/Layouts
+                15 = EXT:your_extension/Resources/Private/Layouts
             }
         }
     }
 
+**Example RealURL configuration**
+
+Add this to your postVarSets:
+
+    'newsletter' => array(
+        array(
+            'GETvar' => 'tx_koningmailchimpsignup_form[controller]',
+            'noMatch' => 'bypass'
+        ),
+        array(
+            'GETvar' => 'tx_koningmailchimpsignup_form[action]',
+            'valueMap' => array(
+                'form' => 'form',
+                'subscribe' => 'create',
+                'subscribed' => 'success',
+                'error' => 'error'
+            ),
+            'noMatch' => 'bypass'
+        ),
+    ),

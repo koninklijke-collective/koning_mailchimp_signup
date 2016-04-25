@@ -1,4 +1,4 @@
-plugin.tx_koningmailchimpsignup {
+plugin.tx_koningmailchimpsignup_form {
     view {
         templateRootPaths {
             10 = EXT:koning_mailchimp_signup/Resources/Private/Templates
