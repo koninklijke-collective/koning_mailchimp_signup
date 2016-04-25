@@ -15,7 +15,7 @@ This extension allows website visitors to sign up for a MailChimp list. It featu
 - Configure the extension in the Extension Manager
 - Configure Scheduler tasks
 
-** Extension Manager setup **
+**Extension Manager setup**
 
 You will need an API key. Check [http://kb.mailchimp.com/accounts/management/about-api-keys](http://kb.mailchimp.com/accounts/management/about-api-keys) for more information.
 
@@ -26,7 +26,7 @@ Make sure composer can autoload. For example, place this code in ``typo3conf/Add
        require_once(PATH_site . 'vendor/autoload.php');
     }
 
-** Scheduler tasks**
+**Scheduler tasks**
 
 - Configure the Extbase CommandController Task ``koning_mailchimp_signup:mailchimp:lists`` to synchronise subscriber lists from MailChimp to TYPO3 (recommende to run once a day).
 - Configure the Extbase CommandController Task ``koning_mailchimp_signup:mailchimp:subscribers`` to synchronise subscribers from TYPO3 to MailChimp (depending on how busy your site is I would recommend to run this once every hour).
