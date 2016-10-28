@@ -39,6 +39,12 @@
             <trans-unit id="configuration.form.list">
                 <source>MailChimp subscriber list</source>
             </trans-unit>
+            <trans-unit id="configuration.form.successPid">
+                <source>Success page id (optional)</source>
+            </trans-unit>
+            <trans-unit id="configuration.form.failedPid">
+                <source>Failed page id (optional)</source>
+            </trans-unit>
             <trans-unit id="configuration.form.list.select">
                 <source>Select from synced lists (run scheduler task if empty)</source>
             </trans-unit>
