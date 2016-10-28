@@ -22,6 +22,26 @@
                     </config>
                 </TCEforms>
             </settings.data.list>
+            <settings.data.successPid>
+                <TCEforms>
+                    <label>LLL:EXT:koning_mailchimp_signup/Resources/Private/Language/locallang_be.xlf:configuration.form.successPid</label>
+                    <config>
+                        <type>input</type>ms>
+                        <eval>trim</eval>
+                        <size>10</size>
+                    </config>
+                </TCEforms>
+            </settings.data.successPid>
+            <settings.data.failedPid>
+                <TCEforms>
+                    <label>LLL:EXT:koning_mailchimp_signup/Resources/Private/Language/locallang_be.xlf:configuration.form.failedPid</label>
+                    <config>
+                        <type>input</type>ms>
+                        <eval>trim</eval>
+                        <size>10</size>
+                    </config>
+                </TCEforms>
+            </settings.data.failedPid>
         </el>
     </ROOT>
 </T3DataStructure>

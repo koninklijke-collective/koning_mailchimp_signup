@@ -61,9 +61,18 @@ class FormController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
             $subscriber->setEmail($email);
             $subscriber->setList($list);
             $this->subscriberRepository->add($subscriber);
-            $this->redirect('success');
+
+            if($this->settings['data']['successPid'] !== "") {
+                $this->redirect('', null, null, null, $this->settings['data']['successPid']);
+            } else {
+                $this->redirect('success');
+            }
         } else {
-            $this->redirect('failed');
+            if($this->settings['data']['failedPid'] !== "") {
+                $this->redirect('', null, null, null, $this->settings['data']['failedPid']);
+            } else {
+                $this->redirect('failed');
+            }
         }
     }
 
