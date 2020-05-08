@@ -5,7 +5,6 @@ This extension allows website visitors to sign up for a MailChimp list. It featu
 - A Scheduler task to retrieve MailChimp lists
 - Frontend plugin to show the form
 - Validation: the form will check if the e-mail address already exists in the MailChimp list
-- Subscribers are first saved into TYPO3: a Scheduler task will save them into to MailChimp database to optimise frontend performance
 - Easily override the template
 
 # Setup
@@ -21,14 +20,13 @@ You will need an API key. Check [http://kb.mailchimp.com/accounts/management/abo
 
 **Scheduler tasks**
 
-- Configure the Extbase CommandController Task ``koning_mailchimp_signup:mailchimp:lists`` to synchronise subscriber lists from MailChimp to TYPO3 (recommende to run once a day).
-- Configure the Extbase CommandController Task ``koning_mailchimp_signup:mailchimp:subscribers`` to synchronise subscribers from TYPO3 to MailChimp (depending on how busy your site is I would recommend to run this once every hour).
+- Configure the Extbase CommandController Task ``mailchimp:import:audiences`` to synchronise audience lists from MailChimp to TYPO3 (recommended to run once a day).
 
 # Frontend
 
 When the MailChimp lists are synced to TYPO3 you can add the ``MailChimp sign up form`` to your page. Configure the list it should save subscribers to and you're done! The Scheduler task should now update your MailChimp list with new entries.
 
-All data (lists and subscribers) is saved on the rootpage (page=0). Subscribers are removed after they are saved in the MailChimp list
+All data (lists and subscribers) is saved on the rootpage (page=0).
 
 **Override the template**
 
@@ -50,24 +48,3 @@ You can override the template by using standard TypoScript:
             }
         }
     }
-
-**Example RealURL configuration**
-
-Add this to your postVarSets:
-
-    'newsletter' => array(
-        array(
-            'GETvar' => 'tx_koningmailchimpsignup_form[controller]',
-            'noMatch' => 'bypass'
-        ),
-        array(
-            'GETvar' => 'tx_koningmailchimpsignup_form[action]',
-            'valueMap' => array(
-                'form' => 'form',
-                'subscribe' => 'create',
-                'subscribed' => 'success',
-                'error' => 'error'
-            ),
-            'noMatch' => 'bypass'
-        ),
-    ),

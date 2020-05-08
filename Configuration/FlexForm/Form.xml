@@ -10,68 +10,33 @@
                     <label>LLL:EXT:koning_mailchimp_signup/Resources/Private/Language/locallang_be.xlf:configuration.form.list</label>
                     <config>
                         <type>select</type>
-                        <foreign_table>tx_koningmailchimpsignup_domain_model_subscriberlist</foreign_table>
-                        <maxitems>1</maxitems>
+                        <renderType>selectSingle</renderType>
                         <eval>required</eval>
-                        <items>
-                            <numIndex index="1">
-                                <numIndex index="0">LLL:EXT:koning_mailchimp_signup/Resources/Private/Language/locallang_be.xlf:configuration.form.list.select</numIndex>
-                                <numIndex index="1"></numIndex>
-                            </numIndex>
-                        </items>
+                        <itemsProcFunc>Keizer\KoningMailchimpSignup\Service\TableConfigurationService->addAvailableAudiences</itemsProcFunc>
                     </config>
                 </TCEforms>
             </settings.data.list>
+            <settings.data.fields>
+                <TCEforms>
+                    <label>LLL:EXT:koning_mailchimp_signup/Resources/Private/Language/locallang_be.xlf:configuration.form.fields</label>
+                    <config>
+                        <type>select</type>
+                        <renderType>selectMultipleSideBySide</renderType>
+                        <minitems>1</minitems>
+                        <default>EMAIL</default>
+                        <itemsProcFunc>Keizer\KoningMailchimpSignup\Service\TableConfigurationService->addAvailableFormFieldsForSelectedAudience</itemsProcFunc>
+                    </config>
+                </TCEforms>
+            </settings.data.fields>
             <settings.data.successPid>
                 <TCEforms>
                     <label>LLL:EXT:koning_mailchimp_signup/Resources/Private/Language/locallang_be.xlf:configuration.form.successPid</label>
                     <config>
                         <type>input</type>
-                        <size>20</size>
-                        <eval>int</eval>
-                        <softref>typolink</softref>
-                        <wizards type="array">
-                            <_PADDING>2</_PADDING>
-                            <link type="array">
-                                <type>popup</type>
-                                <icon>link_popup.gif</icon>
-                                <module>
-                                    <name>wizard_element_browser</name>
-                                    <urlParameters>
-                                        <mode>wizard</mode>
-                                    </urlParameters>
-                                </module>
-                                <JSopenParams>height=300,width=500,status=0,menubar=0,scrollbars=1</JSopenParams>
-                            </link>
-                        </wizards>
+                        <renderType>inputLink</renderType>
                     </config>
                 </TCEforms>
             </settings.data.successPid>
-            <settings.data.failedPid>
-                <TCEforms>
-                    <label>LLL:EXT:koning_mailchimp_signup/Resources/Private/Language/locallang_be.xlf:configuration.form.failedPid</label>
-                    <config>
-                        <type>input</type>
-                        <size>20</size>
-                        <eval>int</eval>
-                        <softref>typolink</softref>
-                        <wizards type="array">
-                            <_PADDING>2</_PADDING>
-                            <link type="array">
-                                <type>popup</type>
-                                <icon>link_popup.gif</icon>
-                                <module>
-                                    <name>wizard_element_browser</name>
-                                    <urlParameters>
-                                        <mode>wizard</mode>
-                                    </urlParameters>
-                                </module>
-                                <JSopenParams>height=300,width=500,status=0,menubar=0,scrollbars=1</JSopenParams>
-                            </link>
-                        </wizards>
-                    </config>
-                </TCEforms>
-            </settings.data.failedPid>
         </el>
     </ROOT>
 </T3DataStructure>
