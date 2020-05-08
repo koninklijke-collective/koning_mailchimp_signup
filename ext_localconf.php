@@ -1,18 +1,25 @@
 <?php
-if (!defined('TYPO3_MODE')) {
-    die('Access denied.');
-}
 
-$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'][] = 'Keizer\\KoningMailchimpSignup\\Command\\MailChimpCommandController';
+defined('TYPO3_MODE') or die('Access denied.');
 
-\TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
-    'Keizer.' . $_EXTKEY,
-    'Form',
-    array(
-        'Form' => 'show, create, success, failed'
-    ),
-    array(
-        'Form' => 'show, create, success, failed'
-    ),
-    \TYPO3\CMS\Extbase\Utility\ExtensionUtility::PLUGIN_TYPE_PLUGIN
-);
+call_user_func(function ($extension): void {
+    $iconRegistry = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Imaging\IconRegistry::class);
+    $iconRegistry->registerIcon(
+        'mailchimp-member',
+        \TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
+        ['source' => 'EXT:koning_mailchimp_signup/Resources/Public/Icons/mailchimp-member.svg']
+    );
+    $iconRegistry->registerIcon(
+        'mailchimp-list',
+        \TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
+        ['source' => 'EXT:koning_mailchimp_signup/Resources/Public/Icons/mailchimp-list.svg']
+    );
+
+    \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
+        'Keizer.' . $extension,
+        'Form',
+        ['Form' => 'show, create, success'],
+        ['Form' => 'create'],
+        \TYPO3\CMS\Extbase\Utility\ExtensionUtility::PLUGIN_TYPE_PLUGIN
+    );
+}, 'koning_mailchimp_signup');

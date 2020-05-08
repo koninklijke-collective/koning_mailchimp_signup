@@ -1,81 +1,117 @@
 <?php
+
 namespace Keizer\KoningMailchimpSignup\Controller;
 
-use Keizer\KoningMailchimpSignup\Domain\Model\Subscriber;
-use Keizer\KoningMailchimpSignup\Domain\Model\SubscriberList;
+use Keizer\KoningMailchimpSignup\Domain\Model\Audience;
+use Keizer\KoningMailchimpSignup\Domain\Repository\AudienceRepository;
+use Keizer\KoningMailchimpSignup\Exception\ExtensionException;
+use Keizer\KoningMailchimpSignup\Service\MailChimpService;
 use Keizer\KoningMailchimpSignup\Utility\ConfigurationUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 
-/**
- * Controller: Form
- *
- * @package Keizer\KoningMailchimpSignup\Controller
- */
-class FormController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
+class FormController extends ActionController
 {
-    /**
-     * @var \Keizer\KoningMailchimpSignup\Domain\Repository\SubscriberListRepository
-     * @inject
-     */
-    protected $subscriberListRepository;
+    /** @var \Keizer\KoningMailchimpSignup\Domain\Model\Audience */
+    protected $audience;
+
+    /** @var \Keizer\KoningMailchimpSignup\Service\MailChimpService */
+    protected $mailChimpService;
+
+    /** @var \Keizer\KoningMailchimpSignup\Domain\Repository\AudienceRepository */
+    protected $audienceRepository;
 
     /**
-     * @var \Keizer\KoningMailchimpSignup\Domain\Repository\SubscriberRepository
-     * @inject
+     * @param  \Keizer\KoningMailchimpSignup\Domain\Repository\AudienceRepository  $audienceRepository
+     * @param  \Keizer\KoningMailchimpSignup\Service\MailChimpService  $mailchimpService
      */
-    protected $subscriberRepository;
+    public function __construct(
+        AudienceRepository $audienceRepository,
+        MailChimpService $mailchimpService
+    ) {
+        parent::__construct();
+        $this->audienceRepository = $audienceRepository;
+        $this->mailChimpService = $mailchimpService;
+    }
+
+    /**
+     * @return void
+     */
+    public function initializeAction(): void
+    {
+        parent::initializeAction();
+
+        if (empty($this->settings['data']['list'])) {
+            return;
+        }
+
+        $this->audience = $this->audienceRepository->get($this->settings['data']['list']);
+    }
 
     /**
      * Show MailChimp registration form
      *
-     * @return void
+     * @return string|void
      * @throws \Exception
      */
     public function showAction()
     {
-        if (!class_exists('\DrewM\MailChimp\MailChimp')) {
-            throw new \Exception('MailChimp API wrapper not found. Run composer require drewm/mailchimp-api to install it.');
+        if (!$this->audience instanceof Audience) {
+            return 'No valid MailChimp audience selected: check plugin configuration.';
         }
 
-        if (!ConfigurationUtility::isValid()) {
-            throw new \Exception('MailChimp settings not found. Check the Extension Manager for configuring the settings.');
+        try {
+            ConfigurationUtility::validate();
+        } catch (ExtensionException $e) {
+            return $e->getMessage();
         }
 
-        if (!isset($this->settings['data']['list']) || !ctype_digit($this->settings['data']['list'])) {
-            throw new \Exception('No MailChimp list selected: check plugin configuration.');
-        }
+        $configuredFields = GeneralUtility::trimExplode(',', $this->settings['data']['fields'], true);
+        $fields = $this->mailChimpService->enhanceFields($this->audience->getIdentifier(), array_flip($configuredFields));
+
+        $this->view->assign('fields', $fields);
     }
 
     /**
-     * Create MailChimp subscriber
+     * Create MailChimp audience member
      *
-     * @param string $email
-     * @validate $email NotEmpty, EmailAddress, \Keizer\KoningMailchimpSignup\Validation\Validator\UniqueSubscriptionValidator
-     * @return void
+     * @param  string  $email
+     * @param  array  $fields
+     * @return string|void
+     * @throws \TYPO3\CMS\Extbase\Mvc\Exception\StopActionException
+     * @throws \TYPO3\CMS\Extbase\Mvc\Exception\UnsupportedRequestTypeException
+     * @TYPO3\CMS\Extbase\Annotation\Validate("NotEmpty", param="email")
+     * @TYPO3\CMS\Extbase\Annotation\Validate("EmailAddress", param="email")
+     * @TYPO3\CMS\Extbase\Annotation\Validate("\Keizer\KoningMailchimpSignup\Validation\Validator\UniqueSubscriptionValidator", param="email")
      */
-    public function createAction($email)
+    public function createAction(string $email = '', array $fields = [])
     {
-        /** @var SubscriberList $list */
-        $list = $this->subscriberListRepository->findByUid($this->settings['data']['list']);
-        if ($list !== null) {
-            $subscriber = new Subscriber();
-            $subscriber->setEmail($email);
-            $subscriber->setList($list);
-            $this->subscriberRepository->add($subscriber);
+        if (!$this->audience instanceof Audience) {
+            return 'No valid MailChimp audience selected: check plugin configuration.';
+        }
 
-            if (isset($this->settings['data']['successPid']) && (int) $this->settings['data']['failedPid'] > 0) {
-                $url = $this->uriBuilder->reset()->setTargetPageUid($this->settings['data']['successPid'])->build();
+        // Flatten fields with expected format
+        foreach ($fields as $key => $value) {
+            if (!is_array($value)) {
+                continue;
+            }
+            if (isset($value['date'], $value['format'])) {
+                $fields[$key] = date($value['format'], strtotime($value['date']));
+                continue;
+            }
+        }
+
+        if ($this->mailChimpService->addMember($this->audience->getIdentifier(), $email, $fields)) {
+            $successPage = (int)($this->settings['data']['successPid'] ?? 0);
+            if ($successPage > 0) {
+                $url = $this->uriBuilder->reset()->setTargetPageUid($successPage)->build();
                 $this->redirectToUri($url);
             } else {
                 $this->redirect('success');
             }
-        } else {
-            if (isset($this->settings['data']['failedPid']) && (int) $this->settings['data']['failedPid'] > 0) {
-                $url = $this->uriBuilder->reset()->setTargetPageUid($this->settings['data']['failedPid'])->build();
-                $this->redirectToUri($url);
-            } else {
-                $this->redirect('failed');
-            }
         }
+
+        $this->forwardToReferringRequest();
     }
 
     /**
@@ -83,16 +119,7 @@ class FormController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
      *
      * @return void
      */
-    public function successAction()
-    {
-    }
-
-    /**
-     * Shown when the provided list does not exist (anymore)
-     *
-     * @return void
-     */
-    public function failedAction()
+    public function successAction(): void
     {
     }
 }

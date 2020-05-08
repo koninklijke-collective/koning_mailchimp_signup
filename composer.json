@@ -1,0 +1,38 @@
+{
+    "name": "koninklijke-collective/koning-mailchimp-signup",
+    "description": "TYPO3 Extension: MailChimp sign up form for TYPO3",
+    "type": "typo3-cms-extension",
+    "keywords": [
+        "TYPO3",
+        "CMS",
+        "Koning",
+        "Mailchimp",
+        "Signup"
+    ],
+    "homepage": "https://github.com/koninklijke-collective/koning_mailchimp_signup",
+    "license": "LGPL-3.0+",
+    "autoload": {
+        "psr-4": {
+            "Keizer\\KoningMailchimpSignup\\": "Classes/"
+        }
+    },
+    "replace": {
+        "typo3-ter/koning-mailchimp-signup": "self.version"
+    },
+    "require": {
+        "typo3/cms-core": ">=9.5.0",
+        "drewm/mailchimp-api": "^2.5"
+    },
+    "authors": [
+        {
+            "name": "Jesper Paardekooper",
+            "homepage": "https://www.bereik.io/",
+            "email": "koninklijkecollective@gmail.com"
+        },
+        {
+            "name": "Benjamin Serfhos",
+            "email": "benjamin@serfhos.com",
+            "homepage": "https://serfhos.com"
+        }
+    ]
+}

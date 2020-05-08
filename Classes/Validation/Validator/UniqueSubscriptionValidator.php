@@ -1,75 +1,90 @@
 <?php
+
 namespace Keizer\KoningMailchimpSignup\Validation\Validator;
 
-use Keizer\KoningMailchimpSignup\Utility\ConfigurationUtility;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use Keizer\KoningMailchimpSignup\Domain\Model\SubscriberList;
+use Keizer\KoningMailchimpSignup\Domain\Repository\AudienceRepository;
+use Keizer\KoningMailchimpSignup\Exception\ValidationException;
+use Keizer\KoningMailchimpSignup\Service\MailChimpService;
+use TYPO3\CMS\Core\Service\FlexFormService;
+use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
+use TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator;
 
 /**
- * Validator: Unique subscription
- *
- * @package Keizer\KoningMailchimpSignup\Validation\Validator
+ * Validator: Unique MailChimp member in audience list
  */
-class UniqueSubscriptionValidator extends \TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator
+class UniqueSubscriptionValidator extends AbstractValidator
 {
-    /**
-     * @var \Keizer\KoningMailchimpSignup\Domain\Repository\SubscriberListRepository
-     * @inject
-     */
-    protected $subscriberListRepository;
+    /** @var \TYPO3\CMS\Core\Service\FlexFormService */
+    protected $flexFormService;
 
-    /**
-     * @var \Keizer\KoningMailchimpSignup\Domain\Repository\SubscriberRepository
-     * @inject
-     */
-    protected $subscriberRepository;
+    /** @var \Keizer\KoningMailchimpSignup\Service\MailChimpService */
+    protected $mailChimpService;
 
-    /**
-     * @var \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer
-     */
+    /** @var \Keizer\KoningMailchimpSignup\Domain\Repository\AudienceRepository */
+    protected $audienceRepository;
+
+    /** @var \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer */
     protected $contentObject;
 
-    /**
-     * @var \TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface
-     */
+    /** @var \TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface */
     protected $configurationManager;
 
     /**
-     * @param \TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface $configurationManager
+     * @param  \TYPO3\CMS\Core\Service\FlexFormService  $flexFormService
      * @return void
      */
-    public function injectConfigurationManager(\TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface $configurationManager) {
+    public function injectFlexFormService(FlexFormService $flexFormService): void
+    {
+        $this->flexFormService = $flexFormService;
+    }
+
+    /**
+     * @param  \Keizer\KoningMailchimpSignup\Service\MailChimpService  $mailChimpService
+     * @return void
+     */
+    public function injectMailChimpService(MailChimpService $mailChimpService): void
+    {
+        $this->mailChimpService = $mailChimpService;
+    }
+
+    /**
+     * @param  \Keizer\KoningMailchimpSignup\Domain\Repository\AudienceRepository  $audienceRepository
+     * @return void
+     */
+    public function injectAudienceRepository(AudienceRepository $audienceRepository): void
+    {
+        $this->audienceRepository = $audienceRepository;
+    }
+
+    /**
+     * @param  \TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface  $configurationManager
+     * @return void
+     */
+    public function injectConfigurationManager(ConfigurationManagerInterface $configurationManager): void
+    {
         $this->configurationManager = $configurationManager;
         $this->contentObject = $this->configurationManager->getContentObject();
     }
 
     /**
-     * @param mixed $value
+     * @param  mixed  $value
      * @return void
      */
-    protected function isValid($value)
+    protected function isValid($value): void
     {
-        /** @var \TYPO3\CMS\Extbase\Service\FlexFormService $flexFormService */
-        $flexFormService = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Service\\FlexFormService');
-        $flexFormArray = $flexFormService->convertFlexFormContentToArray($this->contentObject->data['pi_flexform']);
+        $configuration = $this->flexFormService->convertFlexFormContentToArray($this->contentObject->data['pi_flexform']);
+        $list = $configuration['settings']['data']['list'] ?? '';
+        if (empty($list)) {
+            throw ValidationException::invalidAudience();
+        }
 
-        /** @var SubscriberList $list */
-        $list = $this->subscriberListRepository->findByUid($flexFormArray['settings']['data']['list']);
-        if ($list !== null) {
-            $subscriber = $this->subscriberRepository->findOneByEmailAndSubscriberList(strtolower($value), $list);
-            if ($subscriber !== null) {
-                $this->addError('E-mail address is already subscribed to this list', 1461581334);
-            } else {
-                $settings = ConfigurationUtility::getConfiguration();
-                $mailChimpApi = new \DrewM\MailChimp\MailChimp($settings['mailchimp.']['apiKey']);
-                $url = 'lists/' . $list->getIdentifier() . '/members/' . $mailChimpApi->subscriberHash($value);
-                $memberRequest = $mailChimpApi->get($url);
-                if (isset($memberRequest['status']) && $memberRequest['status'] === 'subscribed') {
-                    $this->addError('E-mail address is already subscribed to this list', 1461581334);
-                }
-            }
-        } else {
-            $this->addError('List not found', 1461581360);
+        $audience = $this->audienceRepository->get($list);
+        if ($audience === null) {
+            throw ValidationException::invalidAudience();
+        }
+
+        if ($this->mailChimpService->isMember($audience->getIdentifier(), $value)) {
+            $this->addError('E-mail address is already subscribed to this list', 1461581334);
         }
     }
 }
